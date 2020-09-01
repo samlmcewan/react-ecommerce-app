@@ -1,5 +1,3 @@
-import { Switch } from 'react-router-dom';
-
 const SHOP_DATA = [
 	{
 		id: 1,
