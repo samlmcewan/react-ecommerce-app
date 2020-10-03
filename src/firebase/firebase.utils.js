@@ -43,6 +43,36 @@ firebase.initializeApp(config);
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
+// this can be used to batch add data to firebase db
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+	const collectionRef = firestore.collection(collectionKey);
+
+	const batch = firestore.batch();
+	objectsToAdd.forEach((obj) => {
+		const newDocRef = collectionRef.doc();
+		batch.set(newDocRef, obj);
+	});
+
+	return await batch.commit();
+};
+
+// transform snapshot data into an object and add routename and id properties
+export const covertSelectionSnapshotToMap = (collections) => {
+	const transformedCollection = collections.docs.map((doc) => {
+		const { title, items } = doc.data();
+		return {
+			routename: encodeURI(title.toLowerCase()),
+			id: doc.id,
+			title,
+			items
+		};
+	});
+	return transformedCollection.reduce((accumulator, collection) => {
+		accumulator[collection.title.toLowerCase()] = collection;
+		return accumulator;
+	}, {});
+};
+
 // set up google authentication utility
 const provider = new firebase.auth.GoogleAuthProvider();
 // trigger google pop up whenever GoogleAuthProvider is used
