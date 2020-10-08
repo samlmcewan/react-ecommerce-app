@@ -57,7 +57,7 @@ export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => 
 };
 
 // transform snapshot data into an object and add routename and id properties
-export const covertSelectionSnapshotToMap = (collections) => {
+export const convertCollectionsSnapshotToMap = (collections) => {
 	const transformedCollection = collections.docs.map((doc) => {
 		const { title, items } = doc.data();
 		return {
@@ -73,11 +73,20 @@ export const covertSelectionSnapshotToMap = (collections) => {
 	}, {});
 };
 
-// set up google authentication utility
-const provider = new firebase.auth.GoogleAuthProvider();
-// trigger google pop up whenever GoogleAuthProvider is used
-provider.setCustomParameters({ prompt: 'select_account' });
+export const getCurrentUser = () => {
+	return new Promise((resolve, reject) => {
+		const unsubscribe = auth.onAuthStateChanged((userAuth) => {
+			unsubscribe();
+			resolve(userAuth);
+		}, reject);
+	});
+};
 
-export const signInWithGoogle = () => auth.signInWithPopup(provider);
+// set up google authentication utility
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
+// trigger google pop up whenever GoogleAuthProvider is used
+googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+export const signInWithGoogle = () => auth.signInWithPopup(googleProvider);
 
 export default firebase;
